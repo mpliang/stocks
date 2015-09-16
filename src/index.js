@@ -34,12 +34,11 @@ var stockApp = angular.module('stockApp', ['ngRoute']);
         $scope.message = 'Lets get started!';
     });
 
-    stockApp.controller('addController', ['$scope', 'stockSearch', function($scope, stockSearch) {
+    stockApp.controller('addController', ['$scope', '$http', 'stockSearch', function($scope, $http, stockSearch) {
         $scope.message = 'Type a symbol or company name.';
+
         $scope.lookup = function() {
-          console.log('button clicked');
           $scope.results = stockSearch.getStock($scope.stock);
-          // console.log($scope.results);
         }
     }]);
 
@@ -50,9 +49,9 @@ var stockApp = angular.module('stockApp', ['ngRoute']);
 //////////////////////////////////////////////////
 stockApp.service('stockSearch', function($http){
   this.getStock = function(link) {
+    var stocks = [];
     $http.jsonp('http://dev.markitondemand.com/Api/v2/Lookup/jsonp?input='+ link + '&callback=JSON_CALLBACK')
       .success(function(data){
-        var stocks = [];
         for (i=0; i<data.length; i++){
           stocks.push({
             name: data[i].Name,
@@ -60,12 +59,10 @@ stockApp.service('stockSearch', function($http){
           });
         }
         console.log(stocks);
-        return stocks;
-        // cb(data.results);
       })
       .error( function(error){
-        // cb(error);
         console.log(error);
       });
+      return stocks;
     };
   });
