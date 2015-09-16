@@ -2,6 +2,12 @@
     <h1>Add a stock</h1>
 
     <p>{{ message }}</p>
-    <input type="text" ng-model="stockSearch">
-    <a href="#stocks" role="button" class="btn btn-success btn-large">Search</a>
+    <input type="text" ng-model="stock" autofocus>
+    <button class="btn btn-success btn-large" ng-click="lookup()">Search</button>
+    <ul>
+      <li ng-repeat="n in results track by $index">
+        {{n.name}}
+      </li>
+    </ul>
+
 </div>

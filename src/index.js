@@ -4,7 +4,7 @@
 //
 // let app = angular.module("stocks", []);
 //
-// app.controller("StockCtrl", function($scope, stockService) {
+// stockApp.controller("StockCtrl", function($scope, stockService) {
 //
 // });
 console.log('loaded');
@@ -14,20 +14,14 @@ var stockApp = angular.module('stockApp', ['ngRoute']);
     // configure our routes
     stockApp.config(function($routeProvider) {
         $routeProvider
-
-            // route for the home page
             .when('/', {
                 templateUrl : 'pages/home.html',
                 controller  : 'mainController'
             })
-
-            // route for the about page
             .when('/add', {
                 templateUrl : 'pages/add.html',
                 controller  : 'addController'
             })
-
-            // route for the contact page
             .when('/stocks', {
                 templateUrl : 'pages/stocks.html',
                 controller  : 'stocksController'
@@ -40,25 +34,38 @@ var stockApp = angular.module('stockApp', ['ngRoute']);
         $scope.message = 'Lets get started!';
     });
 
-    stockApp.controller('addController', function($scope) {
+    stockApp.controller('addController', ['$scope', 'stockSearch', function($scope, stockSearch) {
         $scope.message = 'Type a symbol or company name.';
-    });
+        $scope.lookup = function() {
+          console.log('button clicked');
+          $scope.results = stockSearch.getStock($scope.stock);
+          // console.log($scope.results);
+        }
+    }]);
 
     stockApp.controller('stocksController', function($scope) {
         $scope.message = 'Here are your stocks:';
     });
 
-//
-// app.service('stockService', function(){
-//   this.getStock = cb => {
-//     $http.get(`http://dev.markitondemand.com/Api/v2/Quote/json?symbol=${i}`)
-//       .success(data => {
-//         console.log(data)
-//         cb(data.results);
-//       })
-//       .error( error => {
-//         cb(error);
-//         console.log(error);
-//       });
-//     });
-//   });
+//////////////////////////////////////////////////
+stockApp.service('stockSearch', function($http){
+  this.getStock = function(link) {
+    $http.jsonp('http://dev.markitondemand.com/Api/v2/Lookup/jsonp?input='+ link + '&callback=JSON_CALLBACK')
+      .success(function(data){
+        var stocks = [];
+        for (i=0; i<data.length; i++){
+          stocks.push({
+            name: data[i].Name,
+            symb: data[i].Symbol
+          });
+        }
+        console.log(stocks);
+        return stocks;
+        // cb(data.results);
+      })
+      .error( function(error){
+        // cb(error);
+        console.log(error);
+      });
+    };
+  });
